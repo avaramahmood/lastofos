@@ -10,24 +10,17 @@ Done: GitHub repo, Vercel project linked to it, Clerk app connected, Turso datab
 
 Still to do, in this order:
 
-1. [Revoke the old Firebase key](#1-revoke-the-old-firebase-key)
-2. [Check the Vercel project settings](#2-check-the-vercel-project-settings)
-3. [Set the Vercel environment variables](#3-set-the-vercel-environment-variables)
-4. [Configure Clerk](#4-configure-clerk)
-5. [Create the database tables](#5-create-the-database-tables)
-6. [Add the GitHub secrets](#6-add-the-github-secrets)
-7. [Redeploy and test](#7-redeploy-and-test)
-8. [Before the event](#8-before-the-event)
+1. [Check the Vercel project settings](#1-check-the-vercel-project-settings)
+2. [Set the Vercel environment variables](#2-set-the-vercel-environment-variables)
+3. [Configure Clerk](#3-configure-clerk)
+4. [Create the database tables](#4-create-the-database-tables)
+5. [Add the GitHub secrets](#5-add-the-github-secrets)
+6. [Redeploy and test](#6-redeploy-and-test)
+7. [Before the event](#7-before-the-event)
 
 ---
 
-## 1. Revoke the old Firebase key
-
-An old Firebase service-account key (`firebase/last-of-os-firebase-adminsdk-*.json`) is in the history of the previous repo. This repo does not contain it, but anyone who saw the old one can still use it.
-
-Google Cloud Console > IAM & Admin > Service Accounts > `firebase-adminsdk-...` > **Keys**: delete every key. If you no longer need the old Firebase project, delete the project.
-
-## 2. Check the Vercel project settings
+## 1. Check the Vercel project settings
 
 Vercel > your project > **Settings > General**:
 
@@ -37,7 +30,7 @@ Vercel > your project > **Settings > General**:
 
 If you change the Root Directory, trigger a redeploy afterwards.
 
-## 3. Set the Vercel environment variables
+## 2. Set the Vercel environment variables
 
 Vercel > **Settings > Environment Variables**. Add each one for **Production** (and Preview if you want preview deployments to work):
 
@@ -55,7 +48,7 @@ Important:
 - `VITE_` variables are baked into the site at build time, so redeploy after changing `VITE_CLERK_PUBLISHABLE_KEY`.
 - The publishable key and secret key must come from the **same** Clerk application and the same mode (both `test` or both `live`).
 
-## 4. Configure Clerk
+## 3. Configure Clerk
 
 Clerk dashboard > your application:
 
@@ -65,11 +58,11 @@ Clerk dashboard > your application:
 2. **User & authentication > Social connections**: turn off every provider, including Google.
 3. Nothing to change for paths or domains with development keys. The sign-in box is embedded on `/game` of your own site.
 
-The `@vitstudent.ac.in` restriction is enforced by this app's server, because Clerk's own allowlist is a paid feature in production. Anyone can create a Clerk account, but they only get into the game if their verified primary email ends in `@vitstudent.ac.in`.
+Only verified `@vitstudent.ac.in` addresses can enter the game.
 
 Development vs production: `pk_test_`/`sk_test_` keys work and are free, but show a "Development mode" banner and have limits. The Clerk **Production** instance needs a domain you control (a `*.vercel.app` address does not qualify). For a small event, development keys are fine.
 
-## 5. Create the database tables
+## 4. Create the database tables
 
 One-time, from your computer:
 
@@ -84,7 +77,7 @@ Safe to run again; it only creates what is missing. After this, the `Database mi
 
 If your Turso database was created for an older version of this project, recreate it (`turso db destroy last-of-os`, then create it again), because the tables changed.
 
-## 6. Add the GitHub secrets
+## 5. Add the GitHub secrets
 
 GitHub repo > **Settings > Secrets and variables > Actions > New repository secret**. Add only these two:
 
@@ -99,7 +92,7 @@ What runs automatically:
 - **CI** (every push and pull request): typecheck, API tests on a throwaway database, production build. No secrets needed.
 - **Database migrate** (push to `main` that changes `frontend/db/`, or run it by hand from the Actions tab): applies the schema to Turso.
 
-## 7. Redeploy and test
+## 6. Redeploy and test
 
 1. Push to `main` (or Vercel > Deployments > **Redeploy**). Watch the build in Vercel.
 2. Open the site and click **START GAME**. You should see the Clerk sign-in box.
@@ -108,10 +101,10 @@ What runs automatically:
 5. Sign in with an address listed in `ADMIN_EMAILS`: an **ADMIN** button appears in the lobby, opening `/admin`.
 6. With 4+ accounts (or **Force start** on the admin page), start a game and check each role lands on its own map.
 
-## 8. Before the event
+## 7. Before the event
 
 - Run a full rehearsal with a few real accounts.
-- Decide on Clerk development vs production keys (step 4).
+- Decide on Clerk development vs production keys (step 3).
 - Pick the round length and number of rounds on `/admin` (default 4 rounds x 5 minutes).
 - Optional custom domain: Vercel > **Settings > Domains**. Free options: GitHub Student Developer Pack, or a free subdomain from `is-a.dev`. If you move Clerk to Production, this is the domain you give it.
 
@@ -147,7 +140,7 @@ You still need the Clerk keys in `.env.local` to see the login box.
 | Clerk box shows but no code arrives | check Junk; check Clerk dashboard > Logs; make sure **Email verification code** is enabled |
 | Signed in with a non-VIT account | expected: it is rejected and signed out; retry with the VIT address |
 | `/admin` says "not an admin" | add the email to `ADMIN_EMAILS` in Vercel, then redeploy |
-| API returns 500 on a fresh database | run `pnpm db:migrate` against Turso (step 5) |
+| API returns 500 on a fresh database | run `pnpm db:migrate` against Turso (step 4) |
 | Everyone signed out suddenly | `SESSION_SECRET` changed, or the 12-hour sessions expired |
-| Vercel build fails | check Root Directory is `frontend` (step 2) and read the build log |
+| Vercel build fails | check Root Directory is `frontend` (step 1) and read the build log |
 | Migrate workflow fails | `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` GitHub secrets missing or wrong |

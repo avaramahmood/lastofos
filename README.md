@@ -14,8 +14,6 @@ A multiplayer social-deduction game for VIT students, played in the browser. The
 - [API reference](#api-reference)
 - [Database](#database)
 - [Testing](#testing)
-- [Security model](#security-model)
-- [Known limitations](#known-limitations)
 
 ---
 
@@ -135,7 +133,7 @@ Everything runs on free tiers.
 │   ├── public/             # maps, sprites, backgrounds
 │   ├── DEPLOY.md           # step-by-step deployment and event guide
 │   └── vercel.json         # build output and rewrites
-└── server/                 # legacy Python/Firestore backend, no longer used
+└── server/                 # earlier backend, kept for reference
 ```
 
 ## Running locally
@@ -262,7 +260,7 @@ TURSO_DATABASE_URL=file:local.db SESSION_SECRET=test-secret pnpm test:api
 - login rules
 - the lobby
 - role assignment
-- task gating and anti-spam
+- task gating
 - infection penalties
 - authority scoring
 - ledger and role privacy
@@ -272,19 +270,4 @@ TURSO_DATABASE_URL=file:local.db SESSION_SECRET=test-secret pnpm test:api
 - win conditions
 - the CSV export
 
-The Clerk network call is stubbed. CI runs these tests on every push.
-
-## Security model
-
-- **VIT only:** Clerk proves the player owns the email, and the server accepts only a verified primary address ending in `@vitstudent.ac.in`. Anyone else gets 403.
-- **Server-side rules:** roles, cooldowns, buffers, scoring and win conditions are all enforced by the API, not the browser.
-- **Hidden information:** infection flags and other players' roles are only sent to the auditor and admins while a game is running.
-- **Anti-replay:** each task can be submitted once, and submissions faster than the buffer are rejected.
-- **Secrets** stay in environment variables. Env files are git-ignored, and the Clerk secret key never reaches the browser.
-
-## Known limitations
-
-- **Client-side scoring.** The minigames run in the browser and report their score, so a determined player could fake a score. The server clamps scores (0-100), blocks replays and rate-limits submissions. Moving each minigame's scoring to the server would close this fully.
-- **Development keys.** On Clerk development keys the sign-in box shows a "Development mode" notice. A Clerk production instance needs a custom domain.
-- **Polling.** Game state is polled every 3 seconds instead of pushed live. This is fine for an event-sized game on free tiers. Background tabs pause polling.
-- **Legacy server.** The `server/` folder is the old Python/Firestore backend, kept only for reference.
+CI runs these tests on every push.
