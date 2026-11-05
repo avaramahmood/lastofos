@@ -70,7 +70,7 @@ export default function HowToPlay() {
         <PixelPanel className="p-5 sm:p-6">
           <PixelHeading white="THE" accent="FLOW" className="mb-4 !text-sm" />
           <ol className="font-jura text-sm sm:text-base text-gray-200 space-y-2 list-decimal list-inside">
-            <li>Sign in with your <span className="text-pixel-cyan">@vitstudent.ac.in</span> email and wait in the lobby.</li>
+            <li>Sign in with your VIT Google account (<span className="text-pixel-cyan">@vitstudent.ac.in</span>) and wait in the lobby.</li>
             <li>An admin starts the game. Your secret class appears, then you land on your map.</li>
             <li>The game runs in rounds (usually 4 x 5 minutes). The timer is at the top of your screen.</li>
             <li>Walk into the terminals: <span className="text-white">Task Bay</span> (centre) for your job,

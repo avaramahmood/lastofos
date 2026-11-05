@@ -21,7 +21,7 @@ A multiplayer social-deduction game for VIT students, played in the browser. The
 
 ### Flow
 
-1. Players open the site, click **START GAME** and sign in with their `@vitstudent.ac.in` email. Clerk emails a one-time code; no passwords.
+1. Players open the site, click **START GAME** and sign in with their VIT Google account (`@vitstudent.ac.in`). Google is the only sign-in option; there are no passwords or codes.
 2. Everyone waits in the **lobby**, which shows who has joined.
 3. An admin starts the game. Each player sees a role card for a few seconds, then lands on their role's map.
 4. The game runs in rounds (default **4 rounds x 5 minutes**). The round advances automatically when its timer ends.
@@ -97,7 +97,7 @@ For projecting at an event. It shows the join link, the lobby roster, then the l
 | Frontend | React 18, React Router 6, TypeScript, Vite 7, Tailwind CSS 3 (pixel-art theme: Press Start 2P, Tiny5, Jura) |
 | Backend | Express 5 running as a single Vercel serverless function (`frontend/api/index.ts`) |
 | Database | Turso (libSQL / SQLite) |
-| Login | Clerk (emailed code), exchanged for the game's own 12-hour session token (JWT, `jose`) |
+| Login | Clerk with Google sign-in, exchanged for the game's own 12-hour session token (JWT, `jose`) |
 | Hosting | Vercel, deployed through its GitHub integration |
 | CI | GitHub Actions: typecheck, API tests and build on every push; database migrations on schema changes |
 
@@ -182,7 +182,7 @@ The full walkthrough is in [`frontend/DEPLOY.md`](frontend/DEPLOY.md). In short:
 
 1. Vercel project linked to this repo with **Root Directory `frontend`**. Every push to `main` deploys.
 2. The environment variables above set in Vercel.
-3. Clerk: email address with **email verification code** enabled, password off.
+3. Clerk: **Google** as the only sign-in option (email verification code and password off).
 4. `pnpm db:migrate` once against Turso. Afterwards the `Database migrate` workflow re-applies the schema whenever `frontend/db/` changes, or on demand from the Actions tab.
 
 ## API reference

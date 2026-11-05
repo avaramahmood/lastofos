@@ -1,62 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SignIn, useAuth } from "@clerk/react";
+import { useAuth } from "@clerk/react";
+import { useSignIn } from "@clerk/react/legacy";
 import { exchangeClerkToken, auth, onAuthStateChanged, signOut } from "@/lib/auth";
 import { joinLobby } from "@/lib/api";
 import { PixelButton, PixelPanel } from "@/components/pixel";
 
-// Clerk's own widget, restyled to sit inside the game's panels.
-// Newer Clerk UI versions renamed several variables, so both spellings are set.
-const clerkAppearance: any = {
-  variables: {
-    colorPrimary: "#00e5ff",
-    colorBackground: "#05080f",
-    colorForeground: "#ffffff",
-    colorMutedForeground: "#9ca3af",
-    colorPrimaryForeground: "#000000",
-    colorInput: "#000000",
-    colorInputForeground: "#ffffff",
-    colorText: "#ffffff",
-    colorTextSecondary: "#9ca3af",
-    colorTextOnPrimaryBackground: "#000000",
-    colorInputBackground: "#000000",
-    colorInputText: "#ffffff",
-    colorNeutral: "#ffffff",
-    colorDanger: "#f87171",
-    fontFamily: "'Jura', sans-serif",
-    borderRadius: "0px",
-  },
-  elements: {
-    rootBox: "w-full",
-    cardBox: "w-full !shadow-none !rounded-none !bg-transparent",
-    card: "!shadow-none !bg-transparent !border-0 !rounded-none !p-0 w-full",
-    header: "text-center",
-    headerTitle: "!font-pixel !text-xs !uppercase !text-white",
-    headerSubtitle: "!text-gray-400",
-    formFieldLabel: "!text-gray-300",
-    formFieldInput: "!rounded-none !bg-black !text-white !border-gray-600 focus:!border-[#00e5ff] !shadow-none",
-    formFieldInputShowPasswordButton: "!text-gray-300",
-    formButtonPrimary:
-      "!font-pixel !text-[10px] !uppercase !rounded-none !bg-transparent !border !border-[#00e5ff] !text-[#00e5ff] hover:!bg-[#00e5ff]/20 !shadow-none",
-    socialButtonsBlockButton: "!rounded-none !bg-black/40 !border-gray-600 !text-white hover:!bg-white/10",
-    socialButtonsBlockButtonText: "!text-white",
-    dividerLine: "!bg-gray-600",
-    dividerText: "!text-gray-400",
-    otpCodeFieldInput: "!rounded-none !bg-black !text-white !border-gray-600",
-    formResendButton: "!text-[#00e5ff]",
-    backLink: "!text-[#00e5ff]",
-    footerActionText: "!text-gray-400",
-    footerActionLink: "!text-[#00e5ff]",
-    identityPreview: "!rounded-none !border-gray-600 !bg-transparent",
-    identityPreviewText: "!text-white",
-    identityPreviewEditButton: "!text-[#00e5ff]",
-    alertText: "!text-red-300",
-  },
-};
-
 export default function Game() {
   const navigate = useNavigate();
   const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { isLoaded: signInReady, signIn } = useSignIn();
+  const [redirecting, setRedirecting] = useState(false);
+
+  // Google is the only way in; Clerk sends the player to Google and back to /sso-callback
+  const signInWithGoogle = async () => {
+    if (!signIn) return;
+    setError(null);
+    setRedirecting(true);
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/game",
+      });
+    } catch (err: any) {
+      setRedirecting(false);
+      setError(err?.errors?.[0]?.longMessage ?? err?.message ?? "Could not reach Google. Try again.");
+    }
+  };
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
@@ -127,7 +98,7 @@ export default function Game() {
             LOGIN
           </h2>
           <p className="font-jura text-xs sm:text-sm text-gray-300 text-center mb-6">
-            Use your <span className="text-pixel-cyan">@vitstudent.ac.in</span> email. We send you a one-time code.
+            Sign in with your VIT Google account (<span className="text-pixel-cyan">@vitstudent.ac.in</span>).
           </p>
 
           {error && (
@@ -139,9 +110,19 @@ export default function Game() {
           {working || (isLoaded && isSignedIn) ? (
             <p className="font-pixel text-xs text-pixel-cyan text-center animate-pulse py-6">ENTERING THE O.S...</p>
           ) : (
-            <div className="flex justify-center">
-              <SignIn routing="hash" appearance={clerkAppearance} />
-            </div>
+            <button
+              onClick={signInWithGoogle}
+              disabled={!signInReady || redirecting}
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black/50 border-2 border-pixel-cyan text-pixel-cyan font-pixel text-[10px] sm:text-xs uppercase hover:bg-pixel-cyan/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg aria-hidden="true" viewBox="0 0 48 48" className="w-5 h-5 shrink-0">
+                <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z" />
+                <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+                <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+                <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z" />
+              </svg>
+              {redirecting ? "OPENING GOOGLE..." : "SIGN IN WITH GOOGLE"}
+            </button>
           )}
         </PixelPanel>
 

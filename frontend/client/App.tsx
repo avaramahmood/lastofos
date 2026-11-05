@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 
 // Every other screen is loaded on demand, so phones only download the screens they actually open
 const Game = lazy(() => import("./pages/Game"));
+const SsoCallback = lazy(() => import("./pages/SsoCallback"));
 const Lobby = lazy(() => import("./pages/Lobby"));
 const Results = lazy(() => import("./pages/Results"));
 const HowToPlay = lazy(() => import("./pages/HowToPlay"));
@@ -64,6 +65,7 @@ export const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/game" element={<Game />} />
+            <Route path="/sso-callback" element={<SsoCallback />} />
             <Route path="/lobby" element={<Lobby />} />
             <Route path="/results" element={<Results />} />
             <Route path="/how-to-play" element={<HowToPlay />} />

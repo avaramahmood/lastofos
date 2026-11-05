@@ -1,6 +1,6 @@
 # Deploy guide
 
-Stack: React app + API on **Vercel**, data in **Turso**, login through **Clerk** (emailed code, `@vitstudent.ac.in` only), **GitHub Actions** for tests and database migrations.
+Stack: React app + API on **Vercel**, data in **Turso**, login through **Clerk** (Google sign-in, `@vitstudent.ac.in` only), **GitHub Actions** for tests and database migrations.
 
 Repo: `github.com/avaramahmood/lastofos`. Vercel is linked to it, so **every push to `main` deploys automatically**.
 
@@ -52,15 +52,18 @@ Important:
 
 Clerk dashboard > your application:
 
-1. **User & authentication > Email, phone, username**
-   - Turn on **Email address**, make it **required**, and enable **Email verification code** (this is what sends the code).
+1. **User & authentication > Social connections**: turn on **Google**. Leave every other provider off.
+2. **User & authentication > Email, phone, username**
+   - Keep **Email address** on (Google supplies it, already verified).
+   - Under it, turn **off** "Sign-in with email" / **Email verification code**, so email is not a way to sign in.
    - Turn off **Password**, **Phone number** and **Username**.
-2. **User & authentication > Social connections**: turn off every provider, including Google.
 3. Nothing to change for paths or domains with development keys. The sign-in box is embedded on `/game` of your own site.
 
 Only verified `@vitstudent.ac.in` addresses can enter the game.
 
-Development vs production: `pk_test_`/`sk_test_` keys work and are free, but show a "Development mode" banner and have limits. The Clerk **Production** instance needs a domain you control (a `*.vercel.app` address does not qualify). For a small event, development keys are fine.
+The game shows a single **Sign in with Google** button; Clerk handles the redirect to Google and back (`/sso-callback`).
+
+Development vs production: `pk_test_`/`sk_test_` keys work and are free, and Google sign-in works out of the box with Clerk's shared Google credentials. A Clerk **Production** instance needs a domain you control (a `*.vercel.app` address does not qualify) and your own Google OAuth client ID and secret from Google Cloud Console. For a small event, development keys are fine.
 
 ## 4. Create the database tables
 
@@ -95,8 +98,8 @@ What runs automatically:
 ## 6. Redeploy and test
 
 1. Push to `main` (or Vercel > Deployments > **Redeploy**). Watch the build in Vercel.
-2. Open the site and click **START GAME**. You should see the Clerk sign-in box.
-3. Enter a `@vitstudent.ac.in` address, then the emailed code. You land in the lobby.
+2. Open the site and click **START GAME**. You should see the **Sign in with Google** button.
+3. Choose your `@vitstudent.ac.in` Google account. You land in the lobby.
 4. Try a non-VIT address: it should end with "Only @vitstudent.ac.in email addresses can play."
 5. Sign in with an address listed in `ADMIN_EMAILS`: an **ADMIN** button appears in the lobby, opening `/admin`.
 6. With 4+ accounts (or **Force start** on the admin page), start a game and check each role lands on its own map.
@@ -129,7 +132,7 @@ pnpm dev                        # http://localhost:8080, API served by the same 
 pnpm test:api                   # end-to-end API tests
 ```
 
-You still need the Clerk keys in `.env.local` to see the login box.
+You still need the Clerk keys in `.env.local` for sign-in to work.
 
 ## Troubleshooting
 
@@ -137,7 +140,7 @@ You still need the Clerk keys in `.env.local` to see the login box.
 |---|---|
 | Page says "Missing VITE_CLERK_PUBLISHABLE_KEY" | add it in Vercel (exact name) and redeploy |
 | "Sign-in could not be verified" | `CLERK_SECRET_KEY` missing, or from a different Clerk app/mode than the publishable key |
-| Clerk box shows but no code arrives | check Junk; check Clerk dashboard > Logs; make sure **Email verification code** is enabled |
+| Google button does nothing or errors | make sure **Google** is enabled under Social connections, and the keys match the same Clerk app |
 | Signed in with a non-VIT account | expected: it is rejected and signed out; retry with the VIT address |
 | `/admin` says "not an admin" | add the email to `ADMIN_EMAILS` in Vercel, then redeploy |
 | API returns 500 on a fresh database | run `pnpm db:migrate` against Turso (step 4) |
