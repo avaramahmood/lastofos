@@ -106,6 +106,7 @@ export default function Admin() {
             <p className="text-sm text-gray-400 mt-2">The Last of O.S - live dashboard (refreshes every 3s)</p>
           </div>
           <div className="flex gap-2">
+            <a href="/admin/screen" target="_blank" rel="noreferrer"><PixelButton accent="#facc15" className="!px-3 !py-1.5">Big screen</PixelButton></a>
             <Link to="/lobby"><PixelButton accent="#d1d5db" className="!px-3 !py-1.5">Player view</PixelButton></Link>
             <Btn tone="primary" onClick={() => run("New lobby opened", () =>
               admin.newSession({ totalRounds: Number(rounds), roundMinutes: Number(minutes) }),

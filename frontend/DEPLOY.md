@@ -117,8 +117,10 @@ What runs automatically:
 
 ### Running a game
 
+Before players arrive, put `/admin/screen` (the **Big screen** button on `/admin`) on a projector. It shows the join link, the lobby roster, then the live health bar, round timer and most-trusted players, and finally the result. It never shows anyone's role while the game is running. Point first-timers at **How to Play** (home page, lobby, and the **?** button on every map).
+
 1. `/admin` > **New game** (or the first player to sign in creates a lobby).
-2. Players sign in at `/game` and wait in `/lobby`.
+2. Players sign in at `/game` and wait in `/lobby`, which shows who else has joined. Phones work too: an on-screen pad appears on the maps.
 3. **Start game** (needs 4+ players, or **Force start**). Roles are assigned: about 10% authority, 5% auditor, the rest split citizens and attackers.
 4. Rounds advance on a timer (0 minutes = manual **Next round**). The game ends when system health hits 0 (attackers win) or the last round ends (citizens win).
 5. Players see standings on `/results`; download the CSV from `/admin`.

@@ -76,6 +76,8 @@ ok("health = 94", (await call(T[cit], "GET", `/api/session/${sid}/state`)).j.glo
 ok("double process rejected", (await call(T[auth], "POST", `/api/session/${sid}/certificates/${honest.id}/process`, { action: "reject" })).s === 400);
 
 ok("citizen ledger hides infection", (await call(T[atk], "GET", `/api/session/${sid}/ledger`)).j.entries.every((e: any) => !e.wasInfected));
+{ const al = (await call(T[auth], "GET", `/api/session/${sid}/ledger`)).j.entries;
+  ok("authority sees own decisions, infection hidden", al.length === 2 && al.every((e: any) => !e.wasInfected), al); }
 ok("auditor ledger shows infection", (await call(T[aud], "GET", `/api/session/${sid}/ledger`)).j.entries.some((e: any) => e.wasInfected));
 const lb = (await call(T[cit], "GET", `/api/session/${sid}/leaderboard`)).j.leaderboard;
 ok("roles hidden from citizen, names shown", lb.every((p: any) => p.role === null) && lb[0].name.startsWith("Name"), lb[0]);

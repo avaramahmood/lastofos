@@ -134,12 +134,15 @@ export default function Lobby() {
           </PixelPanel>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap justify-center gap-3">
           {user?.isAdmin && (
             <Link to="/admin">
               <PixelButton accent="#facc15">ADMIN PANEL</PixelButton>
             </Link>
           )}
+          <Link to="/how-to-play">
+            <PixelButton>HOW TO PLAY</PixelButton>
+          </Link>
           <PixelButton onClick={() => signOut()}>SIGN OUT</PixelButton>
         </div>
       </div>

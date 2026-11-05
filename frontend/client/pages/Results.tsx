@@ -50,7 +50,7 @@ export default function Results() {
         <PixelPanel className="w-full max-w-xl p-6 sm:p-8">
           {myRole && (
             <p className="font-pixel text-xs text-white text-center mb-6 leading-relaxed">
-              YOU WERE A <span style={{ color: ROLE_STYLE[myRole].color }}>{myRole.toUpperCase()}</span>
+              YOU WERE {/^[aeiou]/.test(myRole) ? "AN" : "A"} <span style={{ color: ROLE_STYLE[myRole].color }}>{myRole.toUpperCase()}</span>
               <br />
               TRUST SCORE <span className="text-pixel-cyan">{state?.playerTrustScore}</span>
             </p>
