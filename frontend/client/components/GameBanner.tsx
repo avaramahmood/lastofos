@@ -22,18 +22,22 @@ export default function GameBanner({ state, accent = "#6ec4e5" }: { state: GameS
   else if (state.nextGameAt > now) bits.push(`NEXT TASK ${fmt(state.nextGameAt - now)}`);
 
   return (
-    <div className="absolute z-40 top-[6px] left-0 right-0 flex flex-col items-center gap-1 pointer-events-none">
-      <div
-        className="font-pixel text-[10px] sm:text-xs px-3 py-1 bg-black/70 border"
-        style={{ color: accent, borderColor: `${accent}66` }}
-      >
-        {bits.join("  |  ")}
+    <>
+      <div className="absolute z-40 top-[6px] left-0 right-0 flex justify-center pointer-events-none">
+        <div
+          className="font-pixel text-[10px] sm:text-xs px-3 py-1 bg-black/70 border"
+          style={{ color: accent, borderColor: `${accent}66` }}
+        >
+          {bits.join("  |  ")}
+        </div>
       </div>
       {state.announcement && (
-        <div className="font-pixel text-[10px] sm:text-xs px-3 py-1 bg-yellow-400/90 text-black border border-yellow-200 max-w-[90vw] text-center">
-          {state.announcement}
+        <div className="absolute z-40 top-[108px] sm:top-[112px] left-0 right-0 flex justify-center pointer-events-none px-3">
+          <div className="font-pixel text-[10px] sm:text-xs px-3 py-1 bg-yellow-400/90 text-black border border-yellow-200 max-w-[90vw] text-center">
+            {state.announcement}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
